@@ -59,7 +59,7 @@ export default function MyCorner() {
       case 'resume':
         return <MyResumeTemplates />;
       default:
-        return <div className="p-8">Select a menu item</div>;
+        return <div className="p-8">Not implemented yet</div>;
     }
   };
 
