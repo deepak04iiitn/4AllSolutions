@@ -1,14 +1,8 @@
 DEPLOYMENT STEPS FOR LOCAL MACHINE :-
 1) Open the project
 2) Open the terminal and run , npm i , being in the root directory 
-3) Make a .env file in the root directory and paste this :-
-MONGO = 'mongodb+srv://sandeep38yad:$Sandeep$1@sandeepcluster.rxy7u.mongodb.net/automation1?retryWrites=true&w=majority&appName=sandeepCluster'
-JWT_SECRET = 'deepak422003'
-4) Make a .env file in the frontend folder and paste these :-
-VITE_FIREBASE_API_KEY = "AIzaSyDoG6nN1QmYlAEquyGcS7UAepZjXJ99hX4"
-VITE_GEMINI_API_KEY = "AIzaSyCPHDE4ZTN2hgSmOGArCOafImUuU5hlSHI"
-VITE_FIREBASE2_API_KEY = "AIzaSyATGehhdxEEcSKEWC0mDQqXaMH5yv_OAxE"
-VITE_RAZORPAY = "pl_PDkFNY2Ejghe6p"
+3) Make a .env file in the root directory and use the details , Mongo database connection URL , JWT_SECRET.
+4) Make a .env file in the frontend folder and use the details firebase api key , gemini api key.
 5) Now open the terminal and first go to the backend directory by running :- cd backend , and then run , npm run dev
 6) Now split the terminal and in the other one go to the frontend directory by running :- cd frontend , and then run , npm run dev
 7) Click on the link
