@@ -115,3 +115,24 @@ export const dislikeResume = async (req, res, next) => {
         next(error);
     }
 }
+
+
+export const deleteRes = async(req, res, next) => {
+    try {
+        
+        if (!req.user.isUserAdmin && req.user.id !== req.params.resId) {
+            return next(errorHandler(403, 'You are not allowed to delete this resume!'));
+        }
+  
+        
+        const resToDelete = await Template.findById(req.params.resId);
+        if (resToDelete.isUserAdmin) {
+            return next(errorHandler(403, 'Admin account cannot be deleted!'));
+        }
+  
+        await Template.findByIdAndDelete(req.params.resId);
+        res.status(200).json('Resume has been deleted!');
+    } catch (error) {
+        next(error);
+    }
+  }

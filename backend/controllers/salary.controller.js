@@ -162,3 +162,24 @@ export const dislikeSalary = async (req, res, next) => {
         next(error);
     }
 }
+
+
+export const deleteSal = async(req, res, next) => {
+    try {
+        
+        if (!req.user.isUserAdmin && req.user.id !== req.params.salId) {
+            return next(errorHandler(403, 'You are not allowed to delete this salary structure!'));
+        }
+  
+        
+        const salToDelete = await Salary.findById(req.params.salId);
+        if (salToDelete.isUserAdmin) {
+            return next(errorHandler(403, 'Admin account cannot be deleted!'));
+        }
+  
+        await Salary.findByIdAndDelete(req.params.salId);
+        res.status(200).json('Salary Structure has been deleted!');
+    } catch (error) {
+        next(error);
+    }
+  }

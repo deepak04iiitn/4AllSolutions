@@ -101,3 +101,25 @@ export const dislikeExperience = async (req, res, next) => {
         next(error);
     }
 }
+
+
+export const deleteExp = async(req, res, next) => {
+    try {
+        
+        if (!req.user.isUserAdmin && req.user.id !== req.params.expId) {
+            return next(errorHandler(403, 'You are not allowed to delete this experience!'));
+        }
+  
+        
+        const expToDelete = await InterviewExperience.findById(req.params.expId);
+        if (expToDelete.isUserAdmin) {
+            return next(errorHandler(403, 'Admin account cannot be deleted!'));
+        }
+  
+        await InterviewExperience.findByIdAndDelete(req.params.expId);
+        res.status(200).json('Experience has been deleted!');
+    } catch (error) {
+        next(error);
+    }
+  }
+  

@@ -114,3 +114,24 @@ export const dislikeReferral = async (req, res, next) => {
         next(error);
     }
 }
+
+
+export const deleteRef = async(req, res, next) => {
+    try {
+        
+        if (!req.user.isUserAdmin && req.user.id !== req.params.refId) {
+            return next(errorHandler(403, 'You are not allowed to delete this referral!'));
+        }
+  
+        
+        const refToDelete = await Referral.findById(req.params.refId);
+        if (refToDelete.isUserAdmin) {
+            return next(errorHandler(403, 'Admin account cannot be deleted!'));
+        }
+  
+        await Referral.findByIdAndDelete(req.params.refId);
+        res.status(200).json('Referral has been deleted!');
+    } catch (error) {
+        next(error);
+    }
+  }

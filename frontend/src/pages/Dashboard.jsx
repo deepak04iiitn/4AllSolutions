@@ -5,6 +5,10 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('users');
   const [users, setUsers] = useState([]);
   const [comments, setComments] = useState([]);
+  const [interviewExperiences, setInterviewExperiences] = useState([]);
+  const [referrals, setReferrals] = useState([]);
+  const [salaries, setSalaries] = useState([]);
+  const [resumeTemplates, setResumeTemplates] = useState([]);
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [itemToDelete, setItemToDelete] = useState('');
@@ -18,14 +22,52 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (currentUser.isUserAdmin) {
-      setPage(1); // Reset page when tab changes
-      if (activeTab === 'users') {
-        fetchUsers();
-      } else {
-        fetchComments();
+      setPage(1);
+      switch (activeTab) {
+        case 'users':
+          fetchUsers();
+          break;
+        case 'comments':
+          fetchComments();
+          break;
+        case 'interviewExperiences':
+          fetchInterviewExperiences();
+          break;
+        case 'referrals':
+          fetchReferrals();
+          break;
+        case 'salaries':
+          fetchSalaries();
+          break;
+        case 'resumeTemplates':
+          fetchResumeTemplates();
+          break;
       }
     }
   }, [currentUser.isUserAdmin, activeTab]);
+
+
+  const fetchResumeTemplates = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/backend/resumeTemplates/getResume?startIndex=${(page - 1) * ITEMS_PER_PAGE}&limit=${ITEMS_PER_PAGE}`);
+      const data = await res.json();
+      
+      if (res.ok) {
+        if (page === 1) {
+          setResumeTemplates(data);
+        } else {
+          setResumeTemplates(prev => [...prev, ...data]);
+        }
+        setShowMore(data.length === ITEMS_PER_PAGE);
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const fetchUsers = async () => {
     try {
@@ -60,9 +102,69 @@ const Dashboard = () => {
           setComments(prev => [...prev, ...data.comments]);
         }
         setShowMore(data.comments.length === ITEMS_PER_PAGE);
-        
-        // You can store these statistics in state if needed
-        const { totalComments, lastMonthComments, stats } = data;
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchInterviewExperiences = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/backend/interviews/getInterviewExp?startIndex=${(page - 1) * ITEMS_PER_PAGE}&limit=${ITEMS_PER_PAGE}`);
+      const data = await res.json();
+      
+      if (res.ok) {
+        if (page === 1) {
+          setInterviewExperiences(data);
+        } else {
+          setInterviewExperiences(prev => [...prev, ...data]);
+        }
+        setShowMore(data.length === ITEMS_PER_PAGE);
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchReferrals = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/backend/referrals/getReferral?startIndex=${(page - 1) * ITEMS_PER_PAGE}&limit=${ITEMS_PER_PAGE}`);
+      const data = await res.json();
+      
+      if (res.ok) {
+        if (page === 1) {
+          setReferrals(data);
+        } else {
+          setReferrals(prev => [...prev, ...data]);
+        }
+        setShowMore(data.length === ITEMS_PER_PAGE);
+      }
+    } catch (error) {
+      console.log(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchSalaries = async () => {
+    try {
+      setLoading(true);
+      const res = await fetch(`/backend/salary/getSalary?startIndex=${(page - 1) * ITEMS_PER_PAGE}&limit=${ITEMS_PER_PAGE}`);
+      const data = await res.json();
+      
+      if (res.ok) {
+        if (page === 1) {
+          setSalaries(data);
+        } else {
+          setSalaries(prev => [...prev, ...data]);
+        }
+        setShowMore(data.length === ITEMS_PER_PAGE);
       }
     } catch (error) {
       console.log(error.message);
@@ -73,18 +175,51 @@ const Dashboard = () => {
 
   const handleShowMore = () => {
     setPage(prev => prev + 1);
-    if (activeTab === 'users') {
-      fetchUsers();
-    } else {
-      fetchComments();
+    switch (activeTab) {
+      case 'users':
+        fetchUsers();
+        break;
+      case 'comments':
+        fetchComments();
+        break;
+      case 'interviewExperiences':
+        fetchInterviewExperiences();
+        break;
+      case 'referrals':
+        fetchReferrals();
+        break;
+      case 'salaries':
+        fetchSalaries();
+        break;
+      case 'resumeTemplates':
+        fetchResumeTemplates();
+        break;
     }
   };
 
   const handleDelete = async () => {
     try {
-      const endpoint = activeTab === 'users' 
-        ? `/backend/user/delete/${itemToDelete}`
-        : `/backend/comment/deleteComment/${itemToDelete}`;
+      let endpoint = '';
+      switch (activeTab) {
+        case 'users':
+          endpoint = `/backend/user/delete/${itemToDelete}`;
+          break;
+        case 'comments':
+          endpoint = `/backend/comment/deleteComment/${itemToDelete}`;
+          break;
+        case 'interviewExperiences':
+          endpoint = `/backend/interviews/delete/${itemToDelete}`;
+          break;
+        case 'referrals':
+          endpoint = `/backend/referrals/delete/${itemToDelete}`;
+          break;
+        case 'salaries':
+          endpoint = `/backend/salary/delete/${itemToDelete}`;
+          break;
+        case 'resumeTemplates':
+          endpoint = `/backend/resumeTemplates/delete/${itemToDelete}`;
+          break;
+      }
         
       const res = await fetch(endpoint, {
         method: 'DELETE',
@@ -92,10 +227,25 @@ const Dashboard = () => {
       const data = await res.json();
       
       if (res.ok) {
-        if (activeTab === 'users') {
-          setUsers((prev) => prev.filter((user) => user._id !== itemToDelete));
-        } else {
-          setComments((prev) => prev.filter((comment) => comment._id !== itemToDelete));
+        switch (activeTab) {
+          case 'users':
+            setUsers((prev) => prev.filter((user) => user._id !== itemToDelete));
+            break;
+          case 'comments':
+            setComments((prev) => prev.filter((comment) => comment._id !== itemToDelete));
+            break;
+          case 'interviewExperiences':
+            setInterviewExperiences((prev) => prev.filter((exp) => exp._id !== itemToDelete));
+            break;
+          case 'referrals':
+            setReferrals((prev) => prev.filter((referral) => referral._id !== itemToDelete));
+            break;
+          case 'salaries':
+            setSalaries((prev) => prev.filter((salary) => salary._id !== itemToDelete));
+            break;
+          case 'resumeTemplates':
+            setResumeTemplates((prev) => prev.filter((template) => template._id !== itemToDelete));
+            break;
         }
         setShowModal(false);
       } else {
@@ -106,34 +256,6 @@ const Dashboard = () => {
     }
   };
 
-  console.log(comments);
-
-  const handleRoleUpdate = async (userId, newRole) => {
-    setIsUpdating(true);
-    try {
-      const res = await fetch(`/backend/user/update/${userId}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ role: newRole }),
-      });
-      const data = await res.json();
-      if (res.ok) {
-        setUsers((prev) =>
-          prev.map((user) =>
-            user._id === userId ? { ...user, role: newRole } : user
-          )
-        );
-      } else {
-        console.log(data.message);
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setIsUpdating(false);
-    }
-  };
 
   const TabButton = ({ tab, label }) => (
     <button
@@ -326,6 +448,332 @@ const Dashboard = () => {
     </table>
   );
 
+  const ResumeTemplatesTable = () => (
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
+          {[
+            'Company',
+            'Position',
+            'Years of Experience',
+            'Likes',
+            'Dislikes',
+            'Actions'
+          ].map((header) => (
+            <th key={header} className="px-6 py-5 text-left">
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                {header}
+              </span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+        {resumeTemplates.map((template, index) => (
+          <tr
+            key={template._id}
+            className="hover:bg-blue-50/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <td className="px-6 py-4">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                {template.company}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {template.position}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {template.yearsOfExperience} years
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-green-600 flex items-center">
+                <FaCheck className="mr-2" />
+                {template.numberOfLikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-red-600 flex items-center">
+                <FaTimes className="mr-2" />
+                {template.numberOfDislikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <button
+                onClick={() => {
+                  setShowModal(true);
+                  setItemToDelete(template._id);
+                }}
+                className="flex items-center px-3 py-1 rounded-full text-sm text-red-500 hover:text-white hover:bg-red-500 transition-all duration-300"
+              >
+                <FaTrash className="mr-2" />
+                <span>Delete</span>
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+
+  const SalariesTable = () => (
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
+          {[
+            'Company',
+            'Position',
+            'Location',
+            'Salary',
+            'CTC',
+            'Experience',
+            'Likes',
+            'Dislikes',
+            'Actions'
+          ].map((header) => (
+            <th key={header} className="px-6 py-5 text-left">
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                {header}
+              </span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+        {salaries.map((salary, index) => (
+          <tr
+            key={salary._id}
+            className="hover:bg-blue-50/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <td className="px-6 py-4">
+              <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
+                {salary.company}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {salary.position}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {salary.location}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                {salary.salary}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm font-medium text-green-600 dark:text-green-400">
+                {salary.ctc}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {salary.yearsOfExperience} years
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-green-600 flex items-center">
+                <FaCheck className="mr-2" />
+                {salary.numberOfLikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-red-600 flex items-center">
+                <FaTimes className="mr-2" />
+                {salary.numberOfDislikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <button
+                onClick={() => {
+                  setShowModal(true);
+                  setItemToDelete(salary._id);
+                }}
+                className="flex items-center px-3 py-1 rounded-full text-sm text-red-500 hover:text-white hover:bg-red-500 transition-all duration-300"
+              >
+                <FaTrash className="mr-2" />
+                <span>Delete</span>
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  const InterviewExperiencesTable = () => (
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
+          {[
+            'Company',
+            'Position',
+            'Verdict',
+            'Number of Likes',
+            'Number of Dislikes',
+            'Actions'
+          ].map((header) => (
+            <th key={header} className="px-6 py-5 text-left">
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                {header}
+              </span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+        {interviewExperiences.map((experience, index) => (
+          <tr
+            key={experience._id}
+            className="hover:bg-blue-50/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {experience.company}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {experience.position}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className={`text-sm font-medium ${
+                experience.verdict === 'selected' 
+                  ? 'text-green-500' 
+                  : 'text-red-500'
+              }`}>
+                {experience.verdict}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {experience.numberOfLikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {experience.numberOfDislikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <button
+                onClick={() => {
+                  setShowModal(true);
+                  setItemToDelete(experience._id);
+                }}
+                className="flex items-center px-3 py-1 rounded-full text-sm text-red-500 hover:text-white hover:bg-red-500 transition-all duration-300"
+              >
+                <FaTrash className="mr-2" />
+                <span>Delete</span>
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
+  const ReferralsTable = () => (
+    <table className="w-full">
+      <thead>
+        <tr className="bg-gradient-to-r from-blue-50 to-purple-50 dark:from-gray-700 dark:to-gray-800">
+          {[
+            'Full Name',
+            'Company',
+            'Positions',
+            'Contact',
+            'Likes',
+            'Dislikes',
+            'LinkedIn',
+            'Actions'
+          ].map((header) => (
+            <th key={header} className="px-6 py-5 text-left">
+              <span className="text-sm font-bold text-gray-700 dark:text-gray-200 uppercase tracking-wider">
+                {header}
+              </span>
+            </th>
+          ))}
+        </tr>
+      </thead>
+      <tbody className="divide-y divide-gray-100 dark:divide-gray-700">
+        {referrals.map((referral, index) => (
+          <tr
+            key={referral._id}
+            className="hover:bg-blue-50/50 dark:hover:bg-gray-700/50 transition-all duration-300 group"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {referral.fullName}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {referral.company}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {referral.positions.map(p => p.position).join(', ')}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-gray-600 dark:text-gray-300">
+                {referral.contact}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-green-600 flex items-center">
+                <FaCheck className="mr-2" />
+                {referral.numberOfLikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <span className="text-sm text-red-600 flex items-center">
+                <FaTimes className="mr-2" />
+                {referral.numberOfDislikes}
+              </span>
+            </td>
+            <td className="px-6 py-4">
+              <a 
+                href={referral.linkedin} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-sm text-blue-600 hover:underline"
+              >
+                {referral.linkedin !== 'Not Provided' ? 'View Profile' : 'Not Provided'}
+              </a>
+            </td>
+            <td className="px-6 py-4">
+              <button
+                onClick={() => {
+                  setShowModal(true);
+                  setItemToDelete(referral._id);
+                }}
+                className="flex items-center px-3 py-1 rounded-full text-sm text-red-500 hover:text-white hover:bg-red-500 transition-all duration-300"
+              >
+                <FaTrash className="mr-2" />
+                <span>Delete</span>
+              </button>
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+
   const StatusIndicator = ({ status }) => {
     const isActive = status === 'Active';
     return (
@@ -363,18 +811,35 @@ const Dashboard = () => {
     }
   };
 
+
   return (
     <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
       <div className="mb-6 flex justify-center space-x-4">
         <TabButton tab="users" label="Users" />
         <TabButton tab="comments" label="Comments" />
+        <TabButton tab="interviewExperiences" label="Interview Experiences" />
+        <TabButton tab="referrals" label="Referrals" />
+        <TabButton tab="salaries" label="Salary Structures" />
+        <TabButton tab="resumeTemplates" label="Resume Templates" />
       </div>
 
-      {currentUser.isUserAdmin && (activeTab === 'users' ? users.length > 0 : comments.length > 0) ? (
+      {currentUser.isUserAdmin && (
+        activeTab === 'users' ? users.length > 0 :
+        activeTab === 'comments' ? comments.length > 0 :
+        activeTab === 'interviewExperiences' ? interviewExperiences.length > 0 :
+        activeTab === 'salaries' ? salaries.length > 0 :
+        activeTab === 'resumeTemplates' ? resumeTemplates.length > 0 :
+        referrals.length > 0
+      ) ? (
         <div className="animate-fade-in">
           <div className="backdrop-blur-sm bg-white/80 dark:bg-gray-800/80 rounded-2xl shadow-2xl overflow-hidden border border-gray-100 dark:border-gray-700">
             <div className="overflow-x-auto">
-              {activeTab === 'users' ? <UsersTable /> : <CommentsTable />}
+              {activeTab === 'users' ? <UsersTable /> : 
+               activeTab === 'comments' ? <CommentsTable /> : 
+               activeTab === 'interviewExperiences' ? <InterviewExperiencesTable /> : 
+               activeTab === 'salaries' ? <SalariesTable /> :
+               activeTab === 'resumeTemplates' ? <ResumeTemplatesTable /> :
+               <ReferralsTable />}
             </div>
           </div>
 
@@ -387,7 +852,12 @@ const Dashboard = () => {
               {loading ? (
                 'Loading...'
               ) : (
-                `Load More ${activeTab === 'users' ? 'Users' : 'Comments'}`
+                `Load More ${activeTab === 'users' ? 'Users' : 
+                             activeTab === 'comments' ? 'Comments' : 
+                             activeTab === 'interviewExperiences' ? 'Interview Experiences' : 
+                             activeTab === 'salaries' ? 'Salary Structures' :
+                             activeTab === 'resumeTemplates' ? 'Resume Templates' :
+                             'Referrals'}`
               )}
             </button>
           )}
@@ -399,6 +869,7 @@ const Dashboard = () => {
         </div>
       )}
 
+      {/* Delete Confirmation Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 overflow-y-auto bg-black bg-opacity-50 backdrop-blur-sm flex items-center justify-center">
           <div className="relative bg-white dark:bg-gray-800 rounded-2xl max-w-md w-full m-4 p-6 shadow-2xl transform transition-all animate-modal-slide-in">
@@ -408,7 +879,12 @@ const Dashboard = () => {
               </div>
               <div>
                 <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100">
-                  Delete User
+                  Delete {activeTab === 'users' ? 'User' : 
+                          activeTab === 'comments' ? 'Comment' : 
+                          activeTab === 'interviewExperiences' ? 'Interview Experience' : 
+                          activeTab === 'salaries' ? 'Salary Structure' :
+                          activeTab === 'resumeTemplates' ? 'Resume Template' :
+                          'Referral'}
                 </h3>
                 <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   This action cannot be undone. Are you sure?
