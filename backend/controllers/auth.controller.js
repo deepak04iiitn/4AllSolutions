@@ -33,113 +33,102 @@ export const signup = async (req , res , next) => {
 }
 
 
-export const signin = async (req , res , next) => {
+export const signin = async (req, res, next) => {
+    const { email, password } = req.body;
 
-    const { email , password } = req.body;
-
-    if(!email || !password || email === '' || password === '')
-    {
-        next(errorHandler(400 , 'All fields are required!'));
+    if (!email || !password || email === '' || password === '') {
+        next(errorHandler(400, 'All fields are required!'));
     }
 
     try {
-        
         const validUser = await User.findOne({ email });
 
-        if(!validUser)
-        {
-            return next(errorHandler(404 , 'Invalid credentials!'));
+        if (!validUser) {
+            return next(errorHandler(404, 'Invalid credentials!'));
         }
 
-        const validPassword = bcryptjs.compareSync(password , validUser.password);
+        const validPassword = bcryptjs.compareSync(password, validUser.password);
 
-        if(!validPassword)
-        {
-            return next(errorHandler(400 , 'Invalid credentials!'));
+        if (!validPassword) {
+            return next(errorHandler(400, 'Invalid credentials!'));
         }
 
         const token = jwt.sign(
-            {id : validUser._id},
+            { 
+                id: validUser._id,
+                isUserAdmin: validUser.isUserAdmin  // Include isUserAdmin in the token
+            },
             process.env.JWT_SECRET
         );
 
-        const { password : pass , ...rest } = validUser._doc;
+        const { password: pass, ...rest } = validUser._doc;
 
-        res.status(200).cookie('access_token' , token , {
-            httpOnly : true
-        }).json(rest);
-
+        res.status(200)
+           .cookie('access_token', token, {
+                httpOnly: true
+           })
+           .json(rest);
 
     } catch (error) {
         next(error);
     }
 }
 
-
-export const google = async(req , res , next) => {
-
-    // if the user exists , we will sign in the user
-    // if the user does not exist we will create the new user
-    // we are getting 3 infos from the frontend :- name , email , googlePhotoUrl
-    // things we are sending from frontend , in backend we will get them in req.body
-
-    const {name , email , googlePhotoUrl} = req.body;
+// 2. Modify the google auth function to handle admin status
+export const google = async(req, res, next) => {
+    const { name, email, googlePhotoUrl } = req.body;
 
     try {
+        const user = await User.findOne({ email });
 
-        const user = await User.findOne({email});
+        if (user) {
+            const token = jwt.sign(
+                {
+                    id: user._id,
+                    isUserAdmin: user.isUserAdmin  // Include isUserAdmin in the token
+                },
+                process.env.JWT_SECRET
+            );
 
-        if(user)                                                   // user does exist , so just signing in
-            {
-                const token = jwt.sign(                            // token part is must to sign in after we successfully create the user
-                    {
-                        id : user._id,
-                    },
-                    process.env.JWT_SECRET
-                );
+            const { password, ...rest } = user._doc;
 
-                const { password , ...rest } = user._doc;
+            res.status(200)
+               .cookie('access_token', token, {
+                    httpOnly: true
+               })
+               .json(rest);
+        } else {
+            const generatedPassword = Math.random().toString(36).slice(-8) + 
+                                    Math.random().toString(36).slice(-8);
+            const hashedPassword = bcryptjs.hashSync(generatedPassword, 10);
 
-                res.status(200).cookie('access_token' , token , {
-                    httpOnly : true
-                }).json(rest);
-            }
-            else
-            {
-                // now if the user does not exist we have to create a new user
-                // for creating a new user , we will require username , email , password
-                // we can create username from the displayName we are getting from the google , email we are already getting
-                // for the pssword , we will generate a random password , that user can change later
-                // 36 means :- numbers from 0 to 9 and letters from a to z
+            const newUser = new User({
+                username: name.toLowerCase().split(' ').join('') + 
+                         Math.random().toString(9).slice(-4),
+                email,
+                password: hashedPassword,
+                profilePicture: googlePhotoUrl,
+                isUserAdmin: false  // Set default admin status for new users
+            });
 
-                const generatedPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+            await newUser.save();
 
-                const hashedPassword = bcryptjs.hashSync(generatedPassword , 10);
+            const token = jwt.sign(
+                {
+                    id: newUser._id,
+                    isUserAdmin: newUser.isUserAdmin  // Include isUserAdmin in the token
+                },
+                process.env.JWT_SECRET
+            );
 
-                const newUser = new User({
-                    username : name.toLowerCase().split(' ').join('') + Math.random().toString(9).slice(-4),         // Deepak Yadav => deepakyadav5358
-                    email,
-                    password : hashedPassword,
-                    profilePicture : googlePhotoUrl,
-                });
+            const { password, ...rest } = newUser._doc;
 
-                await newUser.save();
-
-                const token = jwt.sign(
-                    {
-                        id : newUser._id,
-                    },
-                    process.env.JWT_SECRET
-                );
-
-                const { password , ...rest } = newUser._doc;
-
-                res.status(200).cookie('access_token' , token , {
-                    httpOnly : true
-                }).json(rest);
-
-            }
-
+            res.status(200)
+               .cookie('access_token', token, {
+                    httpOnly: true
+               })
+               .json(rest);
+        }
     } catch (error) {
         next(error);
     }

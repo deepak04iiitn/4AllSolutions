@@ -19,6 +19,8 @@ import ResumeReviews from './pages/ResumeReviews';
 import ResumeTemplates from './pages/ResumeTemplates';
 import MyCorner from './pages/MyCorner';
 import PremiumSubscription from './pages/PremiumSubscription';
+import PrivateRoute from './components/PrivateRoute';
+import Dashboard from './pages/Dashboard';
 
 
 export default function App() {
@@ -44,6 +46,9 @@ export default function App() {
             {/* <Route path="/resumeReviews" element={<ResumeReviews />} /> */}
             <Route path='/resumeTemplates' element={<ResumeTemplates />} />
             <Route path='/myCorner' element={<MyCorner />} />
+            <Route element={<PrivateRoute />}>
+              <Route path='/dashboard' element={<Dashboard />}></Route>        {/* making dashboard private */}
+            </Route>
             <Route path='/premiumSubscription' element={<PremiumSubscription />} />
         </Routes>
 

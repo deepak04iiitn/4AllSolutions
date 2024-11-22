@@ -4,10 +4,9 @@ import {
   Users,
   DollarSign,
   FileEdit,
-  Settings,
   Menu,
   X,
-  ChevronRight
+  ChevronRight,
 } from 'lucide-react';
 import { useSelector } from 'react-redux';
 import MyInterviews from '../components/MyInterviews';
@@ -16,6 +15,7 @@ import MySalary from '../components/MySalary';
 import MyResumeTemplates from '../components/MyResumeTemplates';
 
 export default function MyCorner() {
+
   const { currentUser } = useSelector((state) => state.user);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -37,8 +37,7 @@ export default function MyCorner() {
     { id: 'interview', icon: FileText, label: 'Interview Exp.' },
     { id: 'referral', icon: Users, label: 'Referrals' },
     { id: 'salary', icon: DollarSign, label: 'Salary Structures' },
-    { id: 'resume', icon: FileEdit, label: 'Resume Templates' },
-    { id: 'settings', icon: Settings, label: 'Settings' }
+    { id: 'resume', icon: FileEdit, label: 'Resume Templates' }
   ];
 
   const handleMenuItemClick = (itemId) => {
@@ -62,6 +61,7 @@ export default function MyCorner() {
         return <div className="p-8">Not implemented yet</div>;
     }
   };
+
 
   return (
     <div className="flex h-screen overflow-hidden">

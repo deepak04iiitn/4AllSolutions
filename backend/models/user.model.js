@@ -19,6 +19,15 @@ const userSchema = new mongoose.Schema({
         type : String,
         default : "https://www.pngall.com/wp-content/uploads/5/Profile.png",
     },
+    role : {
+        type : String,
+        default : "Guest",
+        enum : ["Guest", "Recruiter", "Job Seeker"]
+    },
+    isUserAdmin : {
+        type : Boolean,
+        default : false,
+    },
 } , {timestamps : true})
 
 const User = mongoose.model('User' , userSchema);

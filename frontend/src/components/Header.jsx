@@ -13,7 +13,8 @@ import {
   Info,
   Menu,
   X,
-  Puzzle
+  Puzzle,
+  LayoutDashboard
 } from 'lucide-react';
 import { signoutSuccess } from '../redux/user/userSlice';
 
@@ -156,7 +157,7 @@ export default function Header() {
           exit={{ opacity: 0, y: -20 }}
           transition={{ duration: 0.2 }}
           className="absolute right-0 mt-2 w-72 rounded-2xl bg-white shadow-2xl border border-gray-100 overflow-hidden z-50"
-          onClick={(e) => e.stopPropagation()} // Prevent click from bubbling up
+          onClick={(e) => e.stopPropagation()}
         >
           <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50">
             <div className="flex items-center space-x-3">
@@ -184,6 +185,17 @@ export default function Header() {
               <span>Profile</span>
             </motion.div>
             
+            {currentUser?.isUserAdmin && (
+              <motion.div
+                whileHover={{ x: 8 }}
+                onClick={() => handleProfileNavigation('/dashboard')}
+                className="flex items-center space-x-3 p-3 rounded-xl hover:bg-gradient-to-r from-blue-500 to-purple-500 hover:text-white transition-colors duration-200 cursor-pointer"
+              >
+                <LayoutDashboard size={18} />
+                <span>Dashboard</span>
+              </motion.div>
+            )}
+            
             <motion.div
               whileHover={{ x: 8 }}
               onClick={() => handleProfileNavigation('/myCorner')}
@@ -206,7 +218,6 @@ export default function Header() {
       )}
     </AnimatePresence>
   );
-
 
   const FeaturesDropdown = () => (
     <AnimatePresence>
@@ -290,6 +301,17 @@ export default function Header() {
             <User size={18} />
             <span>Profile</span>
           </button>
+          
+          {currentUser?.isUserAdmin && (
+            <button
+              onClick={() => handleProfileNavigation('/dashboard')}
+              className="w-full py-2 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg"
+            >
+              <LayoutDashboard size={18} />
+              <span>Dashboard</span>
+            </button>
+          )}
+          
           <button
             onClick={() => handleProfileNavigation('/myCorner')}
             className="w-full py-2 flex items-center justify-center space-x-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg"
@@ -297,6 +319,7 @@ export default function Header() {
             <BookOpen size={18} />
             <span>My Corner</span>
           </button>
+          
           <button
             onClick={handleSignout}
             className="w-full py-2 flex items-center justify-center space-x-2 bg-gradient-to-r from-red-500 to-pink-500 text-white rounded-lg"

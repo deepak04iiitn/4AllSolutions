@@ -3,7 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, useNavigate } from 'react-router-dom';
 import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/storage';
 import { CircularProgressbar } from 'react-circular-progressbar';
-import { Camera, LogOut, Trash2, Building, Mail, User } from 'lucide-react';
+import { Camera, LogOut, Trash2, Building, Mail, User, UserCircle } from 'lucide-react';
 import 'react-circular-progressbar/dist/styles.css';
 import { app } from '../firebase.js';
 import { 
@@ -29,148 +29,144 @@ const Input = ({ label, icon: Icon, ...props }) => (
         {label}
       </label>
     </div>
-  );
-  
-  const Button = ({ children, variant = 'primary', className = '', ...props }) => {
-    const baseStyle = "px-6 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 transform hover:scale-105 active:scale-95";
-    const variants = {
-      primary: "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg shadow-blue-500/25",
-      secondary: "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300",
-      danger: "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg shadow-red-500/25",
-    };
-    
-    return (
-      <button className={`${baseStyle} ${variants[variant]} ${className}`} {...props}>
-        {children}
-      </button>
-    );
+);
+
+const Button = ({ children, variant = 'primary', className = '', ...props }) => {
+  const baseStyle = "px-6 py-3 rounded-xl font-medium transition-all duration-200 disabled:opacity-50 transform hover:scale-105 active:scale-95";
+  const variants = {
+    primary: "bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg shadow-blue-500/25",
+    secondary: "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300",
+    danger: "bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg shadow-red-500/25",
   };
   
-  export default function Profile() {
-    const { currentUser, error } = useSelector((state) => state.user);
-    const [imageFile, setImageFile] = useState(null);
-    const [imageFileUrl, setImageFileUrl] = useState(null);
-    const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
-    const [imageFileUploadError, setImageFileUploadError] = useState(null);
-    const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
-    const [formData, setFormData] = useState({});
-    const [showModal, setShowModal] = useState(false);
-    const filePickerRef = useRef();
-    const dispatch = useDispatch();
-    const navigate = useNavigate();
+  return (
+    <button className={`${baseStyle} ${variants[variant]} ${className}`} {...props}>
+      {children}
+    </button>
+  );
+};
 
+const Select = ({ label, icon: Icon, options, ...props }) => (
+  <div className="relative group">
+    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+      <Icon className="h-5 w-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
+    </div>
+    <select
+      {...props}
+      className="w-full pl-10 pr-4 py-3 bg-gray-50 dark:bg-gray-800/50 backdrop-blur-sm border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 dark:focus:border-blue-400 transition-all"
+    >
+      {options.map(option => (
+        <option key={option} value={option}>{option}</option>
+      ))}
+    </select>
+    <label className="absolute -top-2.5 left-3 bg-white dark:bg-gray-900 px-2 text-sm text-gray-600 dark:text-gray-400">
+      {label}
+    </label>
+  </div>
+);
 
-    const handleImageChange = async(e) => {
+export default function Profile() {
+  const { currentUser, error } = useSelector((state) => state.user);
+  const [imageFile, setImageFile] = useState(null);
+  const [imageFileUrl, setImageFileUrl] = useState(null);
+  const [imageFileUploadProgress, setImageFileUploadProgress] = useState(null);
+  const [imageFileUploadError, setImageFileUploadError] = useState(null);
+  const [imageFileUploading, setImageFileUploading] = useState(false);
+  const [updateUserSuccess, setUpdateUserSuccess] = useState(null);
+  const [updateUserError, setUpdateUserError] = useState(null);
+  const [formData, setFormData] = useState({});
+  const [showModal, setShowModal] = useState(false);
+  const filePickerRef = useRef();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
-        const file = e.target.files[0];
+  const handleImageChange = async(e) => {
+    const file = e.target.files[0];
+    if(file) {
+      setImageFile(file);
+      setImageFileUrl(URL.createObjectURL(file));
+    }
+  };
 
-        if(file)
-        {
-            setImageFile(file);
-            setImageFileUrl(URL.createObjectURL(file));                    // this is going to create url of the image for us
-        }
+  useEffect(() => {
+    if(imageFile) {
+      uploadImage();
+    }
+  }, [imageFile]);
 
+  const uploadImage = async() => {
+    setImageFileUploading(true);
+    setImageFileUploadError(null);
+    const storage = getStorage(app);
+    const fileName = new Date().getTime() + imageFile.name;
+    const storageRef = ref(storage, fileName);
+    const uploadTask = uploadBytesResumable(storageRef, imageFile);
+
+    uploadTask.on(
+      'state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        setImageFileUploadProgress(progress.toFixed(0));
+      },
+      (error) => {
+        setImageFileUploadError('Could not upload image (File must be less than 2MB)');
+        setImageFileUploadProgress(null);
+        setImageFile(null);
+        setImageFileUrl(null);
+        setImageFileUploading(false);
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
+          setImageFileUrl(downloadURL);
+          setFormData({ ...formData, profilePicture: downloadURL });
+          setImageFileUploading(false);
+        });
+      }
+    );
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.id]: e.target.value });
+  };
+
+  const handleSubmit = async(e) => {
+    e.preventDefault();
+    setUpdateUserError(null);
+    setUpdateUserSuccess(null);
+
+    if(Object.keys(formData).length === 0) {
+      setUpdateUserError('No changes made!');
+      return;
     }
 
-
-    useEffect(() => {
-
-        if(imageFile)
-        {
-            uploadImage();
-        }
-
-    } , [imageFile])
-
-    const uploadImage = async() => {
-
-        setImageFileUploading(true);
-
-        setImageFileUploadError(null);
-
-        const storage = getStorage(app);
-
-        const fileName = new Date().getTime() + imageFile.name;
-
-        const storageRef = ref(storage , fileName);
-
-        const uploadTask = uploadBytesResumable(storageRef , imageFile);
-
-        uploadTask.on(
-            'state_changed',
-            (snapshot) => {
-                const progress = 
-                    (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setImageFileUploadProgress(progress.toFixed(0));
-            },
-            (error) => {
-                setImageFileUploadError('Could not upload image (File must be less than 2MB');
-                setImageFileUploadProgress(null);
-                setImageFile(null);
-                setImageFileUrl(null);
-                setImageFileUploading(false);
-            },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    setImageFileUrl(downloadURL);
-                    setFormData({ ...formData , profilePicture : downloadURL });
-                    setImageFileUploading(false);
-                })
-            }
-        )
+    if(imageFileUploading) {
+      setUpdateUserError('Please wait for image to upload!');
+      return;
     }
 
+    try {
+      dispatch(updateStart());
+      const res = await fetch(`/backend/user/update/${currentUser._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
 
-    const handleChange = (e) => {
-        setFormData({ ...formData , [e.target.id] : e.target.value });
+      if(!res.ok) {
+        dispatch(updateFailure(data.message));
+        setUpdateUserError(data.message);
+      } else {
+        dispatch(updateSuccess(data));
+        setUpdateUserSuccess("User's profile updated successfully!");
+      }
+    } catch (error) {
+      dispatch(updateFailure(error.message));
+      setUpdateUserError(error.message);
     }
-
-
-    const handleSubmit = async(e) => {
-
-        e.preventDefault();
-        setUpdateUserError(null);
-        setUpdateUserSuccess(null);
-
-        if(Object.keys(formData).length === 0)
-        {
-            setUpdateUserError('No changes made!');
-            return;
-        }
-
-        if(imageFileUploading)
-        {
-            setUpdateUserError('Please wait for image to upload!');
-            return;
-        }
-
-        try {
-
-            dispatch(updateStart());
-
-            const res = await fetch(`/backend/user/update/${currentUser._id}` , {
-                method : 'PUT',
-                headers : {
-                    'Content-Type' : 'application/json',
-                },
-                body : JSON.stringify(formData),
-            });
-            const data = await res.json();
-
-            if(!res.ok)
-            {
-                dispatch(updateFailure(data.message));
-                setUpdateUserError(data.message);
-            }
-            else{
-                dispatch(updateSuccess(data));
-                setUpdateUserSuccess("User's profile updated successfully!");
-            }
-
-        } catch (error) {
-            dispatch(updateFailure(error.message));
-        }
-    }
+  };
 
 
     const handleDeleteUser = async () => {
@@ -281,32 +277,40 @@ const Input = ({ label, icon: Icon, ...props }) => (
                   hidden
                 />
     
-                <div className="space-y-4">
-                  <Input
-                    label="Username"
-                    icon={User}
-                    type="text"
-                    id="username"
-                    defaultValue={currentUser.username}
-                    onChange={handleChange}
-                  />
-                  <Input
-                    label="Email"
-                    icon={Mail}
-                    type="email"
-                    id="email"
-                    defaultValue={currentUser.email}
-                    onChange={handleChange}
-                  />
-                  <Input
-                    label="Password"
-                    icon={Building}
-                    type="password"
-                    id="password"
-                    placeholder="••••••••"
-                    onChange={handleChange}
-                  />
-                </div>
+              <div className="space-y-4">
+                <Input
+                  label="Username"
+                  icon={User}
+                  type="text"
+                  id="username"
+                  defaultValue={currentUser.username}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Email"
+                  icon={Mail}
+                  type="email"
+                  id="email"
+                  defaultValue={currentUser.email}
+                  onChange={handleChange}
+                />
+                <Input
+                  label="Password"
+                  icon={Building}
+                  type="password"
+                  id="password"
+                  placeholder="••••••••"
+                  onChange={handleChange}
+                />
+                <Select
+                  label="Role"
+                  icon={UserCircle}
+                  id="role"
+                  defaultValue={currentUser.role}
+                  onChange={handleChange}
+                  options={['Guest', 'Recruiter', 'Job Seeker']}
+                />
+              </div>
     
                 <div className="space-y-4 pt-4">
                   <Button type="submit" className="w-full">
