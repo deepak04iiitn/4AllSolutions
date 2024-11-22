@@ -1,3 +1,13 @@
+DEPLOYMENT STEPS FOR LOCAL MACHINE :-
+1) Open the project
+2) Open the terminal and run , npm i , being in the root directory 
+3) Make a .env file in the root directory and use the details , Mongo database connection URL , JWT_SECRET.
+4) Make a .env file in the frontend folder and use the details firebase api key , gemini api key.
+5) Now open the terminal and first go to the backend directory by running :- cd backend , and then run , npm run dev
+6) Now split the terminal and in the other one go to the frontend directory by running :- cd frontend , and then run , npm run dev
+7) Click on the link
+
+
 Project: All-in-One Job Portal
 
 Problem Statement : Job seekers often face the overwhelming task of visiting multiple websites to find information essential for their job search. 
