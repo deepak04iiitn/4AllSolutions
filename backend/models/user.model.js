@@ -28,6 +28,15 @@ const userSchema = new mongoose.Schema({
         type : Boolean,
         default : false,
     },
+    status : {
+        type : String,
+        default : "Inactive",
+        enum : ["Active", "Inactive"]
+    },
+    lastVisit: {
+        type: Date,
+        default: Date.now
+    },
 } , {timestamps : true})
 
 const User = mongoose.model('User' , userSchema);
