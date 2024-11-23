@@ -32,6 +32,7 @@ With the Admin Dashboard, we ensure a safe, well-regulated platform, free from s
 2. Job Aggregation 🌐
 Live job listings sourced from multiple platforms (e.g., LinkedIn, Naukri) to provide a comprehensive and up-to-date list, minimizing the need to visit different websites.
 
+
 3. Advanced Filtering 🔍
 Search jobs effortlessly by:
 
@@ -39,20 +40,26 @@ Search jobs effortlessly by:
 --> Location 📍
 --> Experience Level 👨‍💻
 
+
 4. Interview Experiences 🗒️
 Gain valuable insights into the hiring processes of various companies with real user-contributed interview experiences.
+
 
 5. Salary Structures 💸
 Explore salary information across roles and companies to make informed career decisions.
 
+
 6. Referrals 🤝
 Connect with professionals offering referrals to boost your chances of securing interviews.
+
 
 7. Resume Templates 📄
 Access a curated collection of resume templates to create standout applications. Upload your own resumes for guidance and inspiration.
 
+
 8. Public Polls 📊
 Create public polls to seek community advice on job-related questions and make better decisions with peer insights.
+
 
 9. AI Chatbox 🤖
 Get instant, AI-powered answers to:
@@ -61,6 +68,7 @@ Get instant, AI-powered answers to:
 --> Interview preparation
 --> Job market trends
 
+
 10. User Dashboard 🖥️
 Manage everything in one place:
 
@@ -68,11 +76,13 @@ Manage everything in one place:
 --> Personal contributions
 --> Updates
 
+
 Benefits 💼
 --> Time-Saving: No more switching between multiple platforms.
 --> Enhanced Security: Admin moderation ensures spam-free content.
 --> Comprehensive Support: All job search resources on one platform.
 --> User-Friendly Interface: Simplifies the job-seeking process with completely responsive platform.
+
 
 Tech Stack 🖥️
 --> Frontend: React.js, Tailwind CSS
