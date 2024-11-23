@@ -1,46 +1,82 @@
-DEPLOYMENT STEPS FOR LOCAL MACHINE :-
-1) Open the project
-2) Open the terminal and run , npm i , being in the root directory 
-3) Make a .env file in the root directory and use the details , Mongo database connection URL , JWT_SECRET.
-4) Make a .env file in the frontend folder and use the details firebase api key , gemini api key.
-5) Now open the terminal and first go to the backend directory by running :- cd backend , and then run , npm run dev
-6) Now split the terminal and in the other one go to the frontend directory by running :- cd frontend , and then run , npm run dev
-7) Click on the link
+All-in-One Job Portal 🚀
+
+Problem Statement 💡
+Job seekers often face the overwhelming task of visiting multiple websites to find information essential for their job search. They need to search one platform for job listings, another for interview experiences, yet another for salary structures, and still others for resume templates or referrals. This scattered process is time-consuming and frustrating, forcing users to switch between platforms to get the comprehensive information they need.
+
+Solution 🌟
+Our website is the ultimate one-stop solution for job seekers, centralizing all essential resources on a single platform. From live job listings aggregated 24/7 to resume templates, our platform offers a user-friendly interface with powerful filters to streamline the job search journey.
 
 
-Project: All-in-One Job Portal
+Key Features 🛠️
 
-Problem Statement : Job seekers often face the overwhelming task of visiting multiple websites to find information essential for their job search. 
-They may need to search one platform for job listings, another for interview experiences, yet another for salary structures, and still others for resume templates or referrals. 
-This scattered process is both time-consuming and frustrating, as users are forced to switch between sites to get comprehensive information and resources.
+1. Admin Dashboard 🛡️
+--> A robust Admin Dashboard is at the heart of the platform, ensuring security, efficiency, and effective management:
 
-Solution : Our website aims to be the ultimate one-stop solution for job seekers, centralizing all essential resources in a single platform. 
-Our platform aggregates live job listings 24/7 from multiple sources (such as LinkedIn, Naukri, and others) and presents them in an easily navigable format with powerful filters, 
-such as job type (QA, Developer, DevOps, Internship), experience level, and location, to help users quickly find relevant roles.
+🔒 Enhanced Security: Only admins have access to the dashboard, preventing unauthorized modifications.
 
-In addition to job listings, users can access and contribute interview experiences, salary structures, and referral opportunities to foster a community of shared knowledge. 
-Our platform also provides curated resume templates and allows users to upload their resumes for guidance and inspiration.
+👤 Role Assignment: Admins can assign roles to users:
+--> Guest: Limited access to explore resources.
+--> Job Seeker: Access to job listings and other core features.
+--> Recruiter: Permissions to post jobs and provide referrals.
 
-Key Features Include:
+📊 Activity Monitoring: Track user activity (Active/Inactive) and last visit details to detect suspicious behavior.
 
---> Job Aggregation: Live job listings sourced from multiple platforms (e.g., LinkedIn, Naukri) to provide a comprehensive and up-to-date list, minimizing the need to visit different websites.
+🗑️ Content Moderation: Admins can review and delete:
+--> User-contributed interview experiences, referrals, salary structures, and resume templates.
 
---> Advanced Filtering: Easily search for jobs by category (e.g., QA, Developer, DevOps, Intern), location, experience level, and more to find the most relevant opportunities quickly.
+❌ User Management: Admins can deactivate or delete users to maintain platform integrity.
 
---> Interview Experiences: Access a library of real user-contributed interview experiences to gain insights into the hiring processes of various companies.
-
---> Salary Structures: Explore salary information across roles and companies to help you make informed career decisions.
-
---> Referrals: Connect with professionals offering referrals to boost your chances of securing interviews.
-
---> Resume Templates: Browse a collection of resume templates to create standout applications. Users can also upload their resumes for guidance and inspiration.
-
---> Public Polls: Create public polls to seek community advice on job-related questions, helping users make better decisions based on others' opinions.
-
---> AI Chatbox: Get instant, AI-powered answers to questions on career planning, interview preparation, job market trends, and more.
-
---> User Dashboard: Manage your saved jobs, personal contributions, and updates in one organized space.
+With the Admin Dashboard, we ensure a safe, well-regulated platform, free from spam and misuse, offering job seekers a reliable experience.
 
 
-Our platform simplifies the job search process, provides holistic support, and saves users time, ultimately creating a seamless experience for anyone looking to advance their career.
-This platform streamlines the job-seeking journey, providing all necessary resources in a single, user-friendly interface.
+2. Job Aggregation 🌐
+Live job listings sourced from multiple platforms (e.g., LinkedIn, Naukri) to provide a comprehensive and up-to-date list, minimizing the need to visit different websites.
+
+3. Advanced Filtering 🔍
+Search jobs effortlessly by:
+
+--> Category (e.g., QA, Developer, DevOps, Internship)
+--> Location 📍
+--> Experience Level 👨‍💻
+
+4. Interview Experiences 🗒️
+Gain valuable insights into the hiring processes of various companies with real user-contributed interview experiences.
+
+5. Salary Structures 💸
+Explore salary information across roles and companies to make informed career decisions.
+
+6. Referrals 🤝
+Connect with professionals offering referrals to boost your chances of securing interviews.
+
+7. Resume Templates 📄
+Access a curated collection of resume templates to create standout applications. Upload your own resumes for guidance and inspiration.
+
+8. Public Polls 📊
+Create public polls to seek community advice on job-related questions and make better decisions with peer insights.
+
+9. AI Chatbox 🤖
+Get instant, AI-powered answers to:
+
+--> Career planning
+--> Interview preparation
+--> Job market trends
+
+10. User Dashboard 🖥️
+Manage everything in one place:
+
+--> Saved jobs
+--> Personal contributions
+--> Updates
+
+Benefits 💼
+--> Time-Saving: No more switching between multiple platforms.
+--> Enhanced Security: Admin moderation ensures spam-free content.
+--> Comprehensive Support: All job search resources on one platform.
+--> User-Friendly Interface: Simplifies the job-seeking process with completely responsive platform.
+
+Tech Stack 🖥️
+--> Frontend: React.js, Tailwind CSS
+--> Backend: Node.js, Express.js
+--> Database: MongoDB , Firebase
+--> Authentication: Google OAuth
+--> State Management: Redux
