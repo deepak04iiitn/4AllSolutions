@@ -1,3 +1,10 @@
+To access the ADMIN DASHBOARD , please login with the following details :-
+-- Email :- test@gmail.com
+-- Password :- test
+
+After logging in , click on the profile image in the navbar and you will be able to see the Dashboard option .
+
+
 All-in-One Job Portal 🚀
 
 Problem Statement 💡
